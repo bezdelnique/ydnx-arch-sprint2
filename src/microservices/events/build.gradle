@@ -19,10 +19,10 @@ repositories {
 }
 
 dependencies {
-	compileOnly 'org.projectlombok:lombok'
-	 implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok:1.18.34'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.kafka:spring-kafka'
-//	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

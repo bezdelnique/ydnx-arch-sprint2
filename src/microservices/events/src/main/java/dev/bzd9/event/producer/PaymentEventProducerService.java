@@ -1,5 +1,6 @@
 package dev.bzd9.event.producer;
 
+import dev.bzd9.event.config.KafkaConfig;
 import dev.bzd9.event.model.PaymentEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +16,11 @@ public class PaymentEventProducerService {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentEventProducerService.class);
 
-    @Value("${app.kafka.topic}")
-    private String topicName;
-
+    private final KafkaConfig kafkaConfig;
     private final KafkaTemplate<String, PaymentEvent> kafkaTemplate;
 
-    public PaymentEventProducerService(KafkaTemplate<String, PaymentEvent> kafkaTemplate) {
+    public PaymentEventProducerService(KafkaConfig kafkaConfig, KafkaTemplate<String, PaymentEvent> kafkaTemplate) {
+        this.kafkaConfig = kafkaConfig;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -28,7 +28,7 @@ public class PaymentEventProducerService {
         logger.info("Sending payment: {}", paymentEvent);
 
         CompletableFuture<SendResult<String, PaymentEvent>> future =
-                kafkaTemplate.send(topicName, paymentEvent.getPaymentId().toString(), paymentEvent);
+                kafkaTemplate.send(kafkaConfig.getTopicPaymentEvents(), paymentEvent.getPaymentId().toString(), paymentEvent);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {

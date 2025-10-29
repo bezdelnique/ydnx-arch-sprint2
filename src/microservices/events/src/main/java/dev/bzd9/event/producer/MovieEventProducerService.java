@@ -1,5 +1,6 @@
 package dev.bzd9.event.producer;
 
+import dev.bzd9.event.config.KafkaConfig;
 import dev.bzd9.event.model.MovieEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +16,11 @@ public class MovieEventProducerService {
 
     private static final Logger logger = LoggerFactory.getLogger(MovieEventProducerService.class);
 
-    @Value("${app.kafka.topic}")
-    private String topicName;
-
+    private final KafkaConfig kafkaConfig;
     private final KafkaTemplate<String, MovieEvent> kafkaTemplate;
 
-    public MovieEventProducerService(KafkaTemplate<String, MovieEvent> kafkaTemplate) {
+    public MovieEventProducerService(KafkaConfig kafkaConfig, KafkaTemplate<String, MovieEvent> kafkaTemplate) {
+        this.kafkaConfig = kafkaConfig;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -28,7 +28,7 @@ public class MovieEventProducerService {
         logger.info("Sending movie: {}", movieEvent);
 
         CompletableFuture<SendResult<String, MovieEvent>> future =
-                kafkaTemplate.send(topicName, movieEvent.getMovieId().toString(), movieEvent);
+                kafkaTemplate.send(kafkaConfig.getTopicMovieEvents(), movieEvent.getMovieId().toString(), movieEvent);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {

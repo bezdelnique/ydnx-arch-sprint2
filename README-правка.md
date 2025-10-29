@@ -87,12 +87,12 @@ GitHub Actions для непрерывной интеграции и разве�
 
 ### Local Development with Docker Compose
 
-1. Необходимо, чтобы был установлен docker и docker-compose.
+1. Необходимо, чтобы был установлен docker и docker compose.
 
 2. Запускаем сервисы с помощью Docker Compose:
-   ```bash
-   docker-compose up -d
-   ```
+```bash
+docker compose up -d
+```
 
 После запуска сервисы доступны:
 - Monolith: http://localhost:8080
@@ -102,16 +102,16 @@ GitHub Actions для непрерывной интеграции и разве�
 - Kafka UI: http://localhost:8090
 
 3. Останавливаем сервисы:
-   ```bash
-   docker-compose down -v
-   ```
+```bash
+docker compose down -v
+```
 
 4. После внесения изменений рестартим:
 
-   ```bash
-   docker-compose build
-   docker-compose up -d
-   ```
+```bash
+docker compose build
+docker compose up -d
+```
 
 ### Kubernetes Deployment
 
@@ -120,6 +120,11 @@ GitHub Actions для непрерывной интеграции и разве�
 - Kubernetes cluster (v1.19+)
 - Helm (v3.2.0+)
 - kubectl
+
+https://github.com/bhamdouni/minikube-wsl2
+https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download
+
+
 
 #### Развертывание
 
@@ -217,6 +222,6 @@ chmod +x run-tests.sh
    ```bash
    curl http://localhost:8000/api/movies
    ```
-2. Протестируйте постепенный переход, изменив переменную окружения MOVIES_MIGRATION_PERCENT в файле docker-compose.yml.
+2. Протестируйте постепенный переход, изменив переменную окружения MOVIES_MIGRATION_PERCENT в файле docker compose.yml.
 
 3. Проверьте топики Kafka и сообщения через Kafka UI по адресу http://localhost:8090

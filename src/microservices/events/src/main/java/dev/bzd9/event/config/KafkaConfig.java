@@ -1,23 +1,39 @@
 package dev.bzd9.event.config;
 
-import dev.bzd9.event.model.MovieEvent;
-import dev.bzd9.event.model.PaymentEvent;
-import dev.bzd9.event.model.UserEvent;
+import lombok.Data;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.ConsumerFactory;
 
+@Configuration
+@ConfigurationProperties(prefix = "app.kafka")
+@Data
 public class KafkaConfig {
 
-    @Value("${app.kafka.topic}")
-    private String topicName;
+    private String topicUserEvents;
+    private String topicMovieEvents;
+    private String topicPaymentEvents;
 
     @Bean
     public NewTopic userTopic() {
-        return TopicBuilder.name(topicName)
+        return TopicBuilder.name(topicUserEvents)
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+    @Bean
+    public NewTopic movieTopic() {
+        return TopicBuilder.name(topicMovieEvents)
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+    @Bean
+    public NewTopic paymentTopic() {
+        return TopicBuilder.name(topicPaymentEvents)
                 .partitions(3)
                 .replicas(1)
                 .build();

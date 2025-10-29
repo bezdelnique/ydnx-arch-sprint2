@@ -14,8 +14,22 @@ import org.springframework.stereotype.Service;
 public class EventConsumerService {
     private static final Logger logger = LoggerFactory.getLogger(EventConsumerService.class);
 
-    @KafkaListener(topics = "${app.kafka.topic}", groupId = "event-group")
-    public void consume(Object event, @Header(name = "__TypeId__", required = false) String type) {
+    @KafkaListener(topics = "${app.kafka.topic-user-events}", groupId = "event-group")
+    public void userConsume(Object event) {
+        consume(event, true);
+    }
+
+    @KafkaListener(topics = "${app.kafka.topic-movie-events}", groupId = "event-group")
+    public void movieConsume(Object event) {
+        consume(event, true);
+    }
+
+    @KafkaListener(topics = "${app.kafka.topic-payment-events}", groupId = "event-group")
+    public void paymentConsume(Object event) {
+        consume(event, true);
+    }
+
+    public void consume(Object event, boolean process) {
         switch (((ConsumerRecord<?, ?>) event).value()) {
             case MovieEvent movieEvent -> processMovieEvent(movieEvent);
             case PaymentEvent paymentEvent -> processPaymentEvent(paymentEvent);

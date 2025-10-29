@@ -1,5 +1,6 @@
 package dev.bzd9.event.producer;
 
+import dev.bzd9.event.config.KafkaConfig;
 import dev.bzd9.event.model.UserEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +16,11 @@ public class UserEventProducerService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserEventProducerService.class);
 
-    @Value("${app.kafka.topic}")
-    private String topicName;
-
+    private final KafkaConfig kafkaConfig;
     private final KafkaTemplate<String, UserEvent> kafkaTemplate;
 
-    public UserEventProducerService(KafkaTemplate<String, UserEvent> kafkaTemplate) {
+    public UserEventProducerService(KafkaConfig kafkaConfig, KafkaTemplate<String, UserEvent> kafkaTemplate) {
+        this.kafkaConfig = kafkaConfig;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -28,7 +28,7 @@ public class UserEventProducerService {
         logger.info("Sending user: {}", userEvent);
 
         CompletableFuture<SendResult<String, UserEvent>> future =
-                kafkaTemplate.send(topicName, userEvent.getUserId().toString(), userEvent);
+                kafkaTemplate.send(kafkaConfig.getTopicUserEvents(), userEvent.getUserId().toString(), userEvent);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {
