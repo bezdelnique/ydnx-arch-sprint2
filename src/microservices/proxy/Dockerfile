@@ -1,3 +1,6 @@
+# syntax=docker/dockerfile:1.6
+
+
 # Build stage with Gradle and Java 21
 FROM gradle:8.6-jdk21-alpine AS build
 WORKDIR /app
@@ -8,6 +11,10 @@ COPY settings.gradle .
 #COPY gradle.properties .
 COPY gradle ./gradle
 COPY gradlew .
+
+# Pre-download dependencies (cached between builds)
+#RUN --mount=type=cache,target=/home/gradle/.gradle \
+#    ./gradlew dependencies --no-daemon || true \
 
 # Download dependencies (cached unless build files change)
 RUN ./gradlew dependencies --no-daemon

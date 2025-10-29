@@ -29,33 +29,55 @@ public class ProxyController {
     }
 
     @GetMapping("/api/movies")
-    public ResponseEntity<Object> getMovies(@RequestBody Map<String, Object> requestBody) {
+    public ResponseEntity<Object> getMovies() {
         double probability = (double) proxyConfig.getMoviesMigrationPercent() / 100;
         double randomValue = random.nextDouble();
         String url = (randomValue < probability) ? proxyConfig.getMonolithUrl() : proxyConfig.getMoviesServiceUrl();
 
         try {
-            // Create headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // Create HTTP entity with body and headers
-            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-            // Send request to target URL
-            ResponseEntity<Object> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    requestEntity,
-                    Object.class
+            ResponseEntity<byte[]> response = restTemplate.exchange(
+                    url + "/api/movies",
+                    HttpMethod.GET,
+                    null,
+                    byte[].class
             );
 
-            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+            return ResponseEntity
+                    .status(response.getStatusCode())
+                    .headers(response.getHeaders())
+                    .body(response.getBody());
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Proxy error: " + e.getMessage()));
         }
+
+    }
+
+    @GetMapping("/api/users")
+    public ResponseEntity<Object> getUsers() {
+        double probability = (double) proxyConfig.getMoviesMigrationPercent() / 100;
+        double randomValue = random.nextDouble();
+        String url = (randomValue < probability) ? proxyConfig.getMonolithUrl() : proxyConfig.getMoviesServiceUrl();
+
+        try {
+            ResponseEntity<byte[]> response = restTemplate.exchange(
+                    url + "/api/users",
+                    HttpMethod.GET,
+                    null,
+                    byte[].class
+            );
+
+            return ResponseEntity
+                    .status(response.getStatusCode())
+                    .headers(response.getHeaders())
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Proxy error: " + e.getMessage()));
+        }
+
     }
 
 }

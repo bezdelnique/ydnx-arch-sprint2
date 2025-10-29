@@ -23,7 +23,6 @@ services:
       - cinemaabyss-network
 
 
-
   # Monolith Service
   monolith:
     build:
@@ -40,6 +39,7 @@ services:
     networks:
       - cinemaabyss-network
 
+
   # Movies Microservice
   movies-service:
     build:
@@ -55,6 +55,7 @@ services:
       DB_CONNECTION_STRING: postgres://postgres:postgres_password@postgres:5432/cinemaabyss?sslmode=disable
     networks:
       - cinemaabyss-network
+
 
   # Events Microservice
   events-service:
@@ -74,6 +75,7 @@ services:
       - cinemaabyss-network
     volumes:
       - events-service-gradle-cache:/home/gradle/.gradle
+
 
   # Proxy Service (API Gateway)
   proxy-service:
@@ -108,6 +110,7 @@ services:
       - "2181:2181"
     networks:
       - cinemaabyss-network
+
 
   # Kafka
   kafka:
