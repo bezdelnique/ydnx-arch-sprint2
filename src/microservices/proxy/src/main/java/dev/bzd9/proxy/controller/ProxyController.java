@@ -1,10 +1,9 @@
 package dev.bzd9.proxy.controller;
 
 import dev.bzd9.proxy.config.ProxyConfig;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,40 +28,22 @@ public class ProxyController {
     }
 
     @GetMapping("/api/movies")
-    public ResponseEntity<Object> getMovies() {
+    public ResponseEntity<Object> getMovies(HttpServletRequest request) {
         double probability = (double) proxyConfig.getMoviesMigrationPercent() / 100;
         double randomValue = random.nextDouble();
         String url = (randomValue < probability) ? proxyConfig.getMonolithUrl() : proxyConfig.getMoviesServiceUrl();
-
-        try {
-            ResponseEntity<byte[]> response = restTemplate.exchange(
-                    url + "/api/movies",
-                    HttpMethod.GET,
-                    null,
-                    byte[].class
-            );
-
-            return ResponseEntity
-                    .status(response.getStatusCode())
-                    .headers(response.getHeaders())
-                    .body(response.getBody());
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Proxy error: " + e.getMessage()));
-        }
-
+        return doGetProxy(url, request.getRequestURI());
     }
 
     @GetMapping("/api/users")
-    public ResponseEntity<Object> getUsers() {
-        double probability = (double) proxyConfig.getMoviesMigrationPercent() / 100;
-        double randomValue = random.nextDouble();
-        String url = (randomValue < probability) ? proxyConfig.getMonolithUrl() : proxyConfig.getMoviesServiceUrl();
+    public ResponseEntity<Object> getUsers(HttpServletRequest request) {
+        return doGetProxy(proxyConfig.getMonolithUrl(), request.getRequestURI());
+    }
 
+    private ResponseEntity<Object> doGetProxy(String url, String uri) {
         try {
             ResponseEntity<byte[]> response = restTemplate.exchange(
-                    url + "/api/users",
+                    url + uri,
                     HttpMethod.GET,
                     null,
                     byte[].class
@@ -77,7 +58,6 @@ public class ProxyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Proxy error: " + e.getMessage()));
         }
-
     }
 
 }
