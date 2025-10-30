@@ -12,6 +12,8 @@ COPY settings.gradle .
 COPY gradle ./gradle
 COPY gradlew .
 
+RUN chmod +x ./gradlew
+
 # Pre-download dependencies (cached between builds)
 #RUN --mount=type=cache,target=/home/gradle/.gradle \
 #    ./gradlew dependencies --no-daemon || true \

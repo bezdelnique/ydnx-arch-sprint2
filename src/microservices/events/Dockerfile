@@ -9,6 +9,8 @@ COPY settings.gradle .
 COPY gradle ./gradle
 COPY gradlew .
 
+RUN chmod +x ./gradlew
+
 #RUN --mount=type=cache,target=/home/gradle/.gradle \
 #    ./gradlew dependencies --no-daemon || true \
 
