@@ -2,9 +2,9 @@ name: API Tests
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, cinema ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, cinema ]
   workflow_dispatch:
     inputs:
       environment:
@@ -69,3 +69,4 @@ jobs:
       - name: Stop services
         if: always()
         run: docker compose down
+
