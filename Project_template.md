@@ -202,24 +202,24 @@ cat .docker/config.json | base64
 
   1. Создайте namespace:
   ```bash
-  kubectl apply -f src/kubernetes/namespace.yaml
+kubectl apply -f src/kubernetes/namespace.yaml
   ```
   2. Создайте секреты и переменные
   ```bash
-  kubectl apply -f src/kubernetes/configmap.yaml
-  kubectl apply -f src/kubernetes/secret.yaml
-  kubectl apply -f src/kubernetes/dockerconfigsecret.yaml
-  kubectl apply -f src/kubernetes/postgres-init-configmap.yaml
+kubectl apply -f src/kubernetes/configmap.yaml
+kubectl apply -f src/kubernetes/secret.yaml
+kubectl apply -f src/kubernetes/dockerconfigsecret.yaml
+kubectl apply -f src/kubernetes/postgres-init-configmap.yaml
   ```
 
   3. Разверните базу данных:
   ```bash
-  kubectl apply -f src/kubernetes/postgres.yaml
+kubectl apply -f src/kubernetes/postgres.yaml
   ```
 
   На этом этапе если вызвать команду
   ```bash
-  kubectl -n cinemaabyss get pod
+kubectl -n cinemaabyss get pod
   ```
   Вы увидите
 
@@ -228,7 +228,7 @@ cat .docker/config.json | base64
 
   4. Разверните Kafka:
   ```bash
-  kubectl apply -f src/kubernetes/kafka/kafka.yaml
+kubectl apply -f src/kubernetes/kafka/kafka.yaml
   ```
 
   Проверьте, теперь должно быть запущено 3 пода, если что-то не так, то посмотрите логи
