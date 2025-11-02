@@ -38,10 +38,10 @@ spec:
         resources:
           limits:
             cpu: "1000m"
-            memory: "1Gi"
+            memory: "256Mi"
           requests:
             cpu: "500m"
-            memory: "512Mi"
+            memory: "128Mi"
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
@@ -68,7 +68,7 @@ spec:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 10Gi
+          storage: 128Mi
 ---
 apiVersion: v1
 kind: Service
