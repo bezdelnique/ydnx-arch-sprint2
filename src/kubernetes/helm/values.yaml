@@ -5,7 +5,8 @@ global:
 
 # Image pull secrets
 imagePullSecrets:
-  dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6
+  dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6ICJZbVY2WkdWc2JtbHhkV1U2WjJod1h6Y3dXbUkwUzAxSlVqZExNV3RVTTFGTlEySXlhemsyY214R09HcFpVeko0U1hOTFJ3PT0iCgkJfQoJfQp9
+
 # Database configuration
 database:
   host: postgres
@@ -26,14 +27,14 @@ database:
       memory: 512Mi
   persistence:
     enabled: true
-    size: 10Gi
+    size: 128Mi
     accessMode: ReadWriteOnce
 
 # Monolith configuration
 monolith:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/monolith
+    repository: ghcr.io/bezdelnique/ydnx-arch-sprint2/monolith
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -53,7 +54,7 @@ monolith:
 proxyService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/proxy-service
+    repository: ghcr.io/bezdelnique/ydnx-arch-sprint2/proxy-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -73,7 +74,7 @@ proxyService:
 moviesService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/movies-service
+    repository: ghcr.io/bezdelnique/ydnx-arch-sprint2/movies-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -93,7 +94,7 @@ moviesService:
 eventsService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/events-service
+    repository: ghcr.io/bezdelnique/ydnx-arch-sprint2/events-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -114,7 +115,7 @@ kafka:
   enabled: true
   image:
     repository: wurstmeister/kafka
-    tag: 2.13-2.7.0
+    tag: 2.13-2.8.1
     pullPolicy: IfNotPresent
   replicas: 1
   resources:
@@ -150,13 +151,13 @@ zookeeper:
   resources:
     limits:
       cpu: 500m
-      memory: 512Mi
+      memory: 256Mi
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 128Mi
   persistence:
     enabled: true
-    size: 1Gi
+    size: 128Mi
     accessMode: ReadWriteOnce
 
 # Ingress configuration
