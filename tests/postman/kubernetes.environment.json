@@ -25,6 +25,30 @@
       "value": "http://cinemaabyss.example.com",
       "type": "default",
       "enabled": true
+    },
+    {
+      "key": "userId",
+      "value": "13",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "movieId",
+      "value": "777",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "paymentId",
+      "value": "42",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "subscriptionId",
+      "value": "15",
+      "type": "default",
+      "enabled": true
     }
   ],
   "_postman_variable_scope": "environment"

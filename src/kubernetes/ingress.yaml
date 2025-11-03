@@ -5,6 +5,8 @@ metadata:
   namespace: cinemaabyss
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/enable-access-log: "true"
+    nginx.ingress.kubernetes.io/enable-rewrite-log: "true"
 spec:
   ingressClassName: nginx
   rules:
