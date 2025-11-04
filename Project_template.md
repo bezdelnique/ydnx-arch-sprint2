@@ -94,8 +94,8 @@
 Необходимые тесты для проверки этого API вызываются при запуске npm run test:local из папки tests/postman 
 Приложите скриншот тестов и скриншот состояния топиков Kafka из UI http://localhost:8090
 
-![2-kafka-test.png](2-kafka-test.png)
-![img.png](2-kafka-ui-topics.png)
+![2-kafka-test.png](docs/2-kafka-test.png)
+![img.png](docs/2-kafka-ui-topics.png)
 
 
 # Задание 3
@@ -329,7 +329,7 @@ zookeeper-0                       0/1     Running             0          2m1s
   Часть тестов с health-чек упадет, но создание событий отработает.
   Откройте логи event-service и сделайте скриншот обработки событий
 
-![img.png](3-minikube-events-processing.png)
+![img.png](docs/3-minikube-events-processing.png)
 
 
 
@@ -337,7 +337,7 @@ zookeeper-0                       0/1     Running             0          2m1s
 Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.
 
 
-![img.png](3-minikube-movie-list.png)
+![img.png](docs/3-minikube-movie-list.png)
 
 
 # Задание 4
@@ -413,6 +413,9 @@ minikube tunnel
 Потом вызовите 
 https://cinemaabyss.example.com/api/movies
 и приложите скриншот развертывания helm и вывода https://cinemaabyss.example.com/api/movies
+
+![img.png](docs/4-helm-started.png)
+![img.png](docs/4-help-get-movies.png)
 
 ## Удаляем все
 

@@ -38,7 +38,7 @@
       "type": "default",
       "enabled": true
     },
-    {
+  {
       "key": "paymentId",
       "value": "42",
       "type": "default",
