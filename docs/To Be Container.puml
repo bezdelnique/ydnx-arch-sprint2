@@ -130,6 +130,9 @@ Rel(StreamingApi, StreamingDb, "")
 Rel(RecommendationApi, RecommendationDb, "")
 Rel(RecommendationApi, RecommendationQueue, "")
 
+Rel(UserApi, RecommendationQueue, "")
+Rel(MovieMetaApi, RecommendationQueue, "")
+Rel(StreamingApi, RecommendationQueue, "")
 
 
 
