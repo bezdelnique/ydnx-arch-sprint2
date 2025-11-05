@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1.6
 
-
 # Build stage with Gradle and Java 21
 FROM gradle:8.6-jdk21-alpine AS build
 WORKDIR /app
@@ -14,21 +13,21 @@ COPY gradlew .
 
 RUN chmod +x ./gradlew
 
-# Pre-download dependencies (cached between builds)
-#RUN --mount=type=cache,target=/home/gradle/.gradle \
-#    ./gradlew dependencies --no-daemon || true \
-
 # Download dependencies (cached unless build files change)
-RUN ./gradlew dependencies --no-daemon
+#RUN ./gradlew dependencies --no-daemon
+RUN --mount=type=cache,target=/home/gradle/.gradle \
+    ./gradlew dependencies --no-daemon
 
 # Copy source code
 COPY src ./src
 
 # Build the application
-RUN ./gradlew clean build -x test --no-daemon
+#RUN ./gradlew clean build -x test --no-daemon
+RUN --mount=type=cache,target=/home/gradle/.gradle \
+    ./gradlew clean build -x test --no-daemon
 
 # Runtime stage
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Create non-root user for security
