@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   # PostgreSQL Database
   postgres:
     image: postgres:14
@@ -73,8 +74,6 @@ services:
       KAFKA_BROKERS: kafka:9092
     networks:
       - cinemaabyss-network
-    volumes:
-      - events-service-gradle-cache:/home/gradle/.gradle
 
 
   # Proxy Service (API Gateway)
@@ -98,8 +97,6 @@ services:
       MOVIES_MIGRATION_PERCENT: "50"
     networks:
       - cinemaabyss-network
-    volumes:
-      - proxy-service-gradle-cache:/home/gradle/.gradle
 
 
   # ZooKeeper for Kafka

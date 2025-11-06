@@ -26,10 +26,7 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8082
-            - containerPort: 5005
           env:
-            - name: JAVA_TOOL_OPTIONS
-              value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
             - name: PORT
               value: "8082"
             - name: DB_CONNECTION_STRING

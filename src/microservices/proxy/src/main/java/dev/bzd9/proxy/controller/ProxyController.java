@@ -3,10 +3,15 @@ package dev.bzd9.proxy.controller;
 import dev.bzd9.proxy.config.ProxyConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Random;
 
@@ -27,25 +32,92 @@ public class ProxyController {
         return Map.of("status", "true");
     }
 
-    @GetMapping("/api/movies")
-    public ResponseEntity<Object> getMovies(HttpServletRequest request) {
-        double probability = (double) proxyConfig.getMoviesMigrationPercent() / 100;
-        double randomValue = random.nextDouble();
-        String url = (randomValue < probability) ? proxyConfig.getMonolithUrl() : proxyConfig.getMoviesServiceUrl();
-        return doGetProxy(url, request.getRequestURI());
+    @RequestMapping("/api/movies")
+    public ResponseEntity<Object> proxyMovies(HttpServletRequest request) {
+        double percent = proxyConfig.getMoviesMigrationPercent();
+        double threshold = percent / 100.0;
+        boolean routedToNew = random.nextDouble() < threshold;
+
+        String url = routedToNew ?
+                proxyConfig.getMoviesServiceUrl() :
+                proxyConfig.getMonolithUrl();
+
+        return doProxy(url, request);
     }
 
-    @GetMapping("/api/users")
-    public ResponseEntity<Object> getUsers(HttpServletRequest request) {
-        return doGetProxy(proxyConfig.getMonolithUrl(), request.getRequestURI());
+    @RequestMapping("/api/users")
+    public ResponseEntity<Object> proxyUsers(HttpServletRequest request) {
+        return doProxy(proxyConfig.getMonolithUrl(), request);
     }
 
-    private ResponseEntity<Object> doGetProxy(String url, String uri) {
+    @RequestMapping("/api/payments")
+    public ResponseEntity<Object> proxyPayments(HttpServletRequest request) {
+        return doProxy(proxyConfig.getMonolithUrl(), request);
+    }
+
+    @RequestMapping("/api/subscriptions")
+    public ResponseEntity<Object> proxySubscriptions(HttpServletRequest request) {
+        return doProxy(proxyConfig.getMonolithUrl(), request);
+    }
+
+    private ResponseEntity<Object> doProxy(String url, HttpServletRequest request) {
+        if (request.getMethod().equals("POST")) {
+            return doPostProxy(url, request);
+        } else if (request.getMethod().equals("GET")) {
+            return doGetProxy(url, request.getRequestURI(), request.getQueryString());
+        }
+        throw new RuntimeException("Unsupported HTTP method: " + request.getMethod());
+    }
+
+    private ResponseEntity<Object> doGetProxy(String url, String uri, String qs) {
+        qs = qs != null && !qs.isEmpty() ? "?" + qs : "";
+
         try {
             ResponseEntity<byte[]> response = restTemplate.exchange(
-                    url + uri,
+                    url + uri + qs,
                     HttpMethod.GET,
                     null,
+                    byte[].class
+            );
+
+            return ResponseEntity
+                    .status(response.getStatusCode())
+                    .headers(response.getHeaders())
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Proxy error: " + e.getMessage()));
+        }
+    }
+
+    private ResponseEntity<Object> doPostProxy(String urlBase, HttpServletRequest request) {
+        final String body;
+        try {
+            body = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        // Forward headers
+        HttpHeaders headers = new HttpHeaders();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String name = headerNames.nextElement();
+            headers.add(name, request.getHeader(name));
+        }
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+        String uri = request.getRequestURI();
+        String qs = request.getQueryString();
+        qs = qs != null && !qs.isEmpty() ? "?" + qs : "";
+
+        try {
+            ResponseEntity<byte[]> response = restTemplate.exchange(
+                    urlBase + uri + qs,
+                    HttpMethod.POST,
+                    entity,
                     byte[].class
             );
 
