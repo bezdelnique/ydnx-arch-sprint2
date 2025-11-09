@@ -126,9 +126,9 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"User ID matches \"), function () {",
+                  "pm.test(\"User ID matches\", function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(parseInt(jsonData.id)).to.equal(parseInt(pm.collectionVariables.get(\"userId\")));",
+                  "    pm.expect(jsonData.id).to.equal(parseInt(pm.collectionVariables.get(\"userId\")));",
                   "});"
                 ],
                 "type": "text/javascript"
