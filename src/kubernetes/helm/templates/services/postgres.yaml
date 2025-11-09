@@ -91,3 +91,4 @@ spec:
   - port: {{ .Values.database.port }}
     targetPort: 5432
   type: ClusterIP
+

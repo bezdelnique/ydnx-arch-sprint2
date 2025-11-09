@@ -93,7 +93,7 @@
                   "pm.test(\"Response has id\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.id).to.exist;",
-                  "    pm.collectionVariables.set(\"userId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"userId\", parseInt(jsonData.id));",
                   "});"
                 ],
                 "type": "text/javascript"

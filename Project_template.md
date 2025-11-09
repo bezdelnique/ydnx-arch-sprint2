@@ -7,6 +7,39 @@
 Добавьте ссылку на файл в этот шаблон
 [ссылка на файл](ссылка)
 
+
+Домен: Стриминговый сервис
+
+Поддомен: Пользователи и авторизация
+- Регистрация пользователей
+- Авторизация и аутентификация
+- Интеграции с сервисами авторизации
+- Подписка - управление сроком действия подписки
+
+Поддомен: Платежи
+- Прием и обработка платежей
+- Интеграция с экварингом и платежными системами
+
+Поддомен: Маркетинг 
+- Скидки - управление скидками
+- Предоставление информации для внешних интеграций
+- Управление рекламными кампаниями 
+
+Поддомен: Метаданные фильмов
+- Продвинутая админка
+- Подготовка и предоставление данных для разных клиентов
+
+Поддомен: Видео 
+- Предоставление видео потока
+- Сохранение таймкода в разрезе просмотренных фильмов 
+
+Поддомен: Рекомендательная система
+- Интеграция с внешней системой
+
+[To Be Container.puml](docs/To%20Be%20Container.puml)
+
+
+
 # Задание 2
 
 ### 1. Proxy
@@ -47,6 +80,8 @@
 - Протестируйте постепенный переход, изменив переменную окружения MOVIES_MIGRATION_PERCENT в файле docker-compose.yml.
 
 
+
+
 ### 2. Kafka
  Вам как архитектуру нужно также проверить гипотезу насколько просто реализовать применение Kafka в данной архитектуре.
 
@@ -57,7 +92,11 @@
     - Добавьте в docker-compose новый сервис, kafka там уже есть
 
 Необходимые тесты для проверки этого API вызываются при запуске npm run test:local из папки tests/postman 
-Приложите скриншот тестов и скриншот состояния топиков Kafka из UI http://localhost:8090 
+Приложите скриншот тестов и скриншот состояния топиков Kafka из UI http://localhost:8090
+
+![2-kafka-test.png](docs/2-kafka-test.png)
+![img.png](docs/2-kafka-ui-topics.png)
+
 
 # Задание 3
 
@@ -108,6 +147,9 @@ jobs:
 ```
 Как только сборка отработает и в github registry появятся ваши образы, можно переходить к блоку настройки Kubernetes
 Успешным результатом данного шага является "зеленая" сборка и "зеленые" тесты
+
+Моя зеленая сборка:
+https://github.com/bezdelnique/ydnx-arch-sprint2/actions
 
 
 ### Proxy в Kubernetes
@@ -172,24 +214,24 @@ cat .docker/config.json | base64
 
   1. Создайте namespace:
   ```bash
-  kubectl apply -f src/kubernetes/namespace.yaml
+kubectl apply -f src/kubernetes/namespace.yaml
   ```
   2. Создайте секреты и переменные
   ```bash
-  kubectl apply -f src/kubernetes/configmap.yaml
-  kubectl apply -f src/kubernetes/secret.yaml
-  kubectl apply -f src/kubernetes/dockerconfigsecret.yaml
-  kubectl apply -f src/kubernetes/postgres-init-configmap.yaml
+kubectl apply -f src/kubernetes/configmap.yaml
+kubectl apply -f src/kubernetes/secret.yaml
+kubectl apply -f src/kubernetes/dockerconfigsecret.yaml
+kubectl apply -f src/kubernetes/postgres-init-configmap.yaml
   ```
 
   3. Разверните базу данных:
   ```bash
-  kubectl apply -f src/kubernetes/postgres.yaml
+kubectl apply -f src/kubernetes/postgres.yaml
   ```
 
   На этом этапе если вызвать команду
   ```bash
-  kubectl -n cinemaabyss get pod
+kubectl -n cinemaabyss get pod
   ```
   Вы увидите
 
@@ -198,7 +240,7 @@ cat .docker/config.json | base64
 
   4. Разверните Kafka:
   ```bash
-  kubectl apply -f src/kubernetes/kafka/kafka.yaml
+kubectl apply -f src/kubernetes/kafka/kafka.yaml
   ```
 
   Проверьте, теперь должно быть запущено 3 пода, если что-то не так, то посмотрите логи
@@ -245,6 +287,20 @@ cat .docker/config.json | base64
   zookeeper-0                       1/1     Running 
 ```
 
+```
+$ kubectl -n cinemaabyss get pods
+NAME                              READY   STATUS              RESTARTS   AGE
+events-service-5695b65d87-wkb7v   0/1     ContainerCreating   0          118s
+kafka-0                           0/1     ContainerCreating   0          2m1s
+monolith-55b597dc74-gq5rn         0/1     ContainerCreating   0          2m
+movies-service-5f59b6f66f-5x9t7   0/1     ContainerCreating   0          119s
+postgres-0                        1/1     Running             0          2m2s
+proxy-service-655cbcf6d4-kx474    0/1     ContainerCreating   0          117s
+zookeeper-0                       0/1     Running             0          2m1s
+```
+
+
+
   8. Добавим ingress
 
   - добавьте аддон
@@ -265,6 +321,7 @@ cat .docker/config.json | base64
   Вы должны увидеть вывод списка фильмов
   Можно поэкспериментировать со значением   MOVIES_MIGRATION_PERCENT в src/kubernetes/configmap.yaml и убедится, что вызовы movies уходят полностью в новый сервис
 
+
   12. Запустите тесты из папки tests/postman
   ```bash
    npm run test:kubernetes
@@ -272,8 +329,15 @@ cat .docker/config.json | base64
   Часть тестов с health-чек упадет, но создание событий отработает.
   Откройте логи event-service и сделайте скриншот обработки событий
 
+Этого достаточно? Тут видна и отправка и обработка событий
+![img.png](docs/3-minikube-events-processing.png)
+
+
 #### Шаг 3
 Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.
+
+
+![img.png](docs/3-minikube-movie-list.png)
 
 
 # Задание 4
@@ -349,6 +413,9 @@ minikube tunnel
 Потом вызовите 
 https://cinemaabyss.example.com/api/movies
 и приложите скриншот развертывания helm и вывода https://cinemaabyss.example.com/api/movies
+
+![img.png](docs/4-helm-started.png)
+![img.png](docs/4-help-get-movies.png)
 
 ## Удаляем все
 

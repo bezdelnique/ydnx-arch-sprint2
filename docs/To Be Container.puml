@@ -1,0 +1,142 @@
+@startuml
+
+title "Диаграмма контейнеров приложения Кинобездна"
+
+top to bottom direction
+
+!include C4/C4_Container.puml
+
+Boundary(UserBoundary, "Пользователи системы") {
+    Person(User, "Пользователь")
+    Person(MarketingUser, "Маркетологи")
+    Person(ContentUser, "Служба контента")
+    Person(SupportUser, "Служба поддержки")
+}
+
+System_Boundary(StreamingApp, "Приложения использующие API") {
+    System(WebApp, "WebApp")
+    System(SmartTvApp, "SmartTvApp")
+    System(MobileApp, "MobileApp")
+}
+
+
+System_Boundary(StreamingSystem, "Ландшафт стримингого сервиса") {
+
+    Container_Boundary("BffSystem", "Backend for frontend API") {
+
+    }
+
+    Container_Boundary("GatewayApiSystem", "Gateway API") {
+    }
+
+    System_Boundary(StreamingSystem, "Cтриминговый сервис Кинобездна") {
+
+        System_Boundary(PaymentService, "Платежи") {
+            Container(PaymentApi, "API")
+            Container(PaymentProcessing, "Обработка платежей")
+            ContainerDb(PaymentDb, "DB")
+            ContainerQueue(PaymentQueue, "DB")
+        }
+
+        System_Boundary(MarketingService, "Маркетинг") {
+            Container(MarketingApi, "API")
+            ContainerDb(MarketingDb, "DB")
+            ContainerQueue(MarketingQueue, "Queue")
+        }
+
+        System_Boundary(MovieMetaService, "Метаданные фильмов") {
+            Container(MovieMetaApi, "API")
+            ContainerDb(MovieMetaDb, "DB")
+        }
+
+        System_Boundary(StreamingService, "Видео") {
+            Container(StreamingApi, "API")
+            ContainerDb(StreamingDb, "DB")
+        }
+
+        System_Boundary(RecommendationService, "Рекомендательная система") {
+            Container(RecommendationApi, "API")
+            ContainerDb(RecommendationDb, "DB")
+            ContainerQueue(RecommendationQueue, "Queue")
+        }
+
+        System_Boundary(UserService, "Пользователи и авторизация") {
+            Container(UserApi, "API")
+            ContainerDb(UserDb, "DB")
+        }
+    }
+
+}
+
+
+System_Boundary(AuthSystemExt, "Внешние сервисы авторизации") {
+    System_Ext("VkAuthSystem", "VK OAuth")
+    System_Ext("YandexAuthSystem", "Yandex OAuth")
+}
+
+System_Boundary(RecommendationSystemExt, "Внешняя рекомендательная система") {
+    SystemQueue_Ext(RecommendationQueueExt, "Queue")
+}
+
+System_Ext(BankSystemExt, "Экваринг банков") {
+
+}
+
+System_Ext(PaymentSystemExt, "Платежные системы") {
+
+}
+
+System_Boundary(MarketingSystemExt, "Платформы для продвижения") {
+    System_Ext("YandexDirectSystem", "Яндекс.Директ")
+}
+
+
+Rel(User, StreamingApp, "Пользуется сервисом")
+Rel(MarketingUser, "WebApp", "Пользуется сервисом")
+Rel(ContentUser, "WebApp", "Пользуется сервисом")
+Rel(SupportUser, "WebApp", "Пользуется сервисом")
+
+Rel(StreamingApp, BffSystem, "Направляет запросы")
+Rel(BffSystem, GatewayApiSystem, "Направляет запросы")
+
+Rel(GatewayApiSystem, UserApi, "")
+Rel(GatewayApiSystem, PaymentApi, "")
+Rel(GatewayApiSystem, MarketingApi, "")
+Rel(GatewayApiSystem, MovieMetaApi, "")
+Rel(GatewayApiSystem, StreamingApi, "")
+Rel(GatewayApiSystem, RecommendationApi, "")
+
+Rel_D(UserApi, AuthSystemExt, "")
+Rel(RecommendationQueue, RecommendationQueueExt, "")
+Rel_L(PaymentProcessing, BankSystemExt, "")
+Rel_L(PaymentProcessing, PaymentSystemExt, "")
+Rel_D(MarketingQueue, MarketingSystemExt, "")
+
+Rel(UserApi, UserDb, "")
+
+Rel(PaymentApi, PaymentDb, "")
+Rel(PaymentApi, PaymentProcessing, "")
+Rel(PaymentApi, PaymentQueue, "")
+Rel(PaymentQueue, PaymentDb, "")
+
+Rel(MarketingApi, MarketingDb, "")
+Rel(MarketingApi, MarketingQueue, "")
+Rel(MarketingQueue, MarketingDb, "")
+
+Rel(MovieMetaApi, MovieMetaDb, "")
+
+Rel(StreamingApi, StreamingDb, "")
+
+Rel(RecommendationApi, RecommendationDb, "")
+Rel(RecommendationApi, RecommendationQueue, "")
+
+Rel(UserApi, RecommendationQueue, "")
+Rel(MovieMetaApi, RecommendationQueue, "")
+Rel(StreamingApi, RecommendationQueue, "")
+
+
+
+
+
+@enduml
+
