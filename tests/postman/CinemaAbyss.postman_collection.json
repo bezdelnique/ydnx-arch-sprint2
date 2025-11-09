@@ -93,7 +93,7 @@
                   "pm.test(\"Response has id\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.id).to.exist;",
-                  "    pm.collectionVariables.set(\"userId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"userId\", parseInt(jsonData.id));",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -126,9 +126,9 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"User ID matches\", function () {",
+                  "pm.test(\"User ID matches \"), function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.id).to.equal(parseInt(pm.collectionVariables.get(\"userId\")));",
+                  "    pm.expect(parseInt(jsonData.id)).to.equal(parseInt(pm.collectionVariables.get(\"userId\")));",
                   "});"
                 ],
                 "type": "text/javascript"

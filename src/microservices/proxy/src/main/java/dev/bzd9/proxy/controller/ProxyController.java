@@ -2,6 +2,8 @@ package dev.bzd9.proxy.controller;
 
 import dev.bzd9.proxy.config.ProxyConfig;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Random;
 
+@Slf4j
 @RestController
 public class ProxyController {
     private final RestTemplate restTemplate;
@@ -24,7 +27,6 @@ public class ProxyController {
     public ProxyController(RestTemplate restTemplate, ProxyConfig proxyConfig) {
         this.restTemplate = restTemplate;
         this.proxyConfig = proxyConfig;
-
     }
 
     @GetMapping("/health")
@@ -32,7 +34,7 @@ public class ProxyController {
         return Map.of("status", "true");
     }
 
-    @RequestMapping("/api/movies")
+    @RequestMapping({"/api/movies", "/api/movies/health"})
     public ResponseEntity<Object> proxyMovies(HttpServletRequest request) {
         double percent = proxyConfig.getMoviesMigrationPercent();
         double threshold = percent / 100.0;
@@ -71,27 +73,44 @@ public class ProxyController {
 
     private ResponseEntity<Object> doGetProxy(String url, String uri, String qs) {
         qs = qs != null && !qs.isEmpty() ? "?" + qs : "";
+        String fullUrl = url + uri + qs;
+        log.info("Proxy GET: {}", fullUrl);
 
         try {
             ResponseEntity<byte[]> response = restTemplate.exchange(
-                    url + uri + qs,
+                    fullUrl,
                     HttpMethod.GET,
                     null,
                     byte[].class
             );
 
+            HttpHeaders headers = new HttpHeaders();
+            response.getHeaders().forEach((key, valueList) -> {
+                if (!key.equalsIgnoreCase("Transfer-Encoding") &&
+                        !key.equalsIgnoreCase("Connection")) {
+                    headers.put(key, valueList);
+                }
+            });
+
             return ResponseEntity
                     .status(response.getStatusCode())
-                    .headers(response.getHeaders())
+                    .headers(headers)
                     .body(response.getBody());
 
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Proxy error: " + e.getMessage()));
         }
     }
 
     private ResponseEntity<Object> doPostProxy(String urlBase, HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String qs = request.getQueryString();
+        qs = qs != null && !qs.isEmpty() ? "?" + qs : "";
+        String fullUrl = urlBase + uri + qs;
+        log.info("Proxy POST: {}", fullUrl);
+
         final String body;
         try {
             body = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
@@ -109,13 +128,9 @@ public class ProxyController {
         }
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-        String uri = request.getRequestURI();
-        String qs = request.getQueryString();
-        qs = qs != null && !qs.isEmpty() ? "?" + qs : "";
-
         try {
             ResponseEntity<byte[]> response = restTemplate.exchange(
-                    urlBase + uri + qs,
+                    fullUrl,
                     HttpMethod.POST,
                     entity,
                     byte[].class
@@ -127,6 +142,7 @@ public class ProxyController {
                     .body(response.getBody());
 
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Proxy error: " + e.getMessage()));
         }

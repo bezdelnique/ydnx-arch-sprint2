@@ -14,9 +14,12 @@ data:
   DB_USER: {{ .Values.database.user | quote }}
 
   # Service URLs
-  MONOLITH_URL: "http://monolith:{{ .Values.monolith.service.port }}"
-  MOVIES_SERVICE_URL: "http://movies:{{ .Values.moviesService.service.port }}"
+  MONOLITH_URL: "http://monolith.cinemaabyss.svc.cluster.local:{{ .Values.monolith.service.port }}"
+  MOVIES_SERVICE_URL: "http://movies-service.cinemaabyss.svc.cluster.local:{{ .Values.moviesService.service.port }}"
   
   # Strangler Fig configuration
   GRADUAL_MIGRATION: {{ .Values.config.gradualMigration | quote }}
   MOVIES_MIGRATION_PERCENT: {{ .Values.config.moviesMigrationPercent | quote }}
+
+  LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: "DEBUG"
+  LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_HTTP_CONVERTER: "DEBUG"
